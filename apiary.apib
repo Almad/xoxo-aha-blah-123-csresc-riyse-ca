@@ -1,46 +1,158 @@
-FORMAT: 1A
+FORMAT: X-1A
+HOST: http://api.apiary.io/
 
-# xoxo aha Blah 123 čšřěšč=říýšě=čá
-Notes API is a *short texts saving* service similar to its physical paper presence on your table.
+# Apiary private API
 
-# Group Notes
-Notes related resources of the **Notes API**
+## Group Test Jobs
 
-## Notes Collection [/notes]
-### List all Notes [GET]
-+ Response 200 (application/json)
+### Test Jobs collection [/tests/runs]
 
-        [{
-          "id": 1, "title": "Jogging in park"
-        }, {
-          "id": 2, "title": "Pick-up posters from post-office"
-        }]
+#### Create a Test run [POST]
 
-### Create a Note [POST]
 + Request (application/json)
 
-        { "title": "Buy cheese and bread for breakfast." }
+  ```
+  {
+    "blueprint": "My Api \n#My resource [/resource]\n# Action [GET]",
+    "agent": 'travisci'
+    "ci": true,
+    "build_id": 1,
+    "build_number": 1,
+    "job_id": 1,
+    "job_number": 1,
+    "start_at": 1381924285,
+    "end_at": 1381924299,
+    "status": 'started'
+  }
+  ```
 
-+ Response 201 (application/json)
++ Response 201
 
-        { "id": 3, "title": "Buy cheese and bread for breakfast." }
+#### Retrieve multiple test runs [GET]
 
-## Note [/notes/{id}]
-A single Note object with all its details
++ Request
 
-+ Parameters
-    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
++ Response 200
 
-### Retrieve a Note [GET]
-+ Response 200 (application/json)
+  ```
+  [
+    {
+      "blueprint": "My Api \n#My resource [/resource]\n# Action [GET]",
+      "agent": 'travisci'
+      "ci": true,
+      "build_id": 1,
+      "build_number": 1,
+      "job_id": 1,
+      "job_number": 1,
+      "start_at": 1381924285,
+      "end_at": 1381924299,
+      "status": 'started'
+    }
+  ]
+  ```
 
-    + Header
 
-            X-My-Header: The Value
+### Test run [/tests/run/{id}]
+  
+- Parameters
+  - id (number) ... Unique id of the run in Apiary
 
-    + Body
+- Model
+  - Attributes
+    - blueprint (string) ... Blueprint used for the test run
+    - agent (string) ... Who performed the test
+    - ci (boolean) ... True if test run is performed in some Continous Integration system
+    - build_id (integer) ... Unique build ID in the particular CI system
+    - build_number (integer) ... Sequential build ID unique for the project
+    - job_id (integer) ... Unique build job ID in the particular CI systme
+    - job_number (integer) ... Seqential build job unique for the build
+    - start_at (integer) ... Unix timestamp when test run started
+    - end_at (integer) ... Unix timestamp when test run ended
+    - status (string) ... Test run result
 
-            { "id": 2, "title": "Pick-up posters from post-office" }
+  - Body
 
-### Remove a Note [DELETE]
+    ```
+    {
+      "blueprint": "My Api \n#My resource [/resource]\n# Action [GET]",
+      "agent": "travisci"
+      "ci": true,
+      "build_id": 1,
+      "build_number": 1,
+      "job_id": 1,
+      "job_number": 1,
+      "start_at": 1381924285,
+      "end_at": 1381924299,
+      "status": "started"
+    }
+    ```
+
+#### Update Attributes [PATCH]
+
++ Request
+  
+  ```
+  {
+    "ended_at": "1381924299" 
+    "status": "passed"
+  }
+  ```
+
 + Response 204
+
+### Retreive [GET]
+
++ Response 200
+
+
+## Group Test Steps 
+
+### Test steps [/tests/steps]
+
+#### Create [POST]
+
+#### Retrieve [GET]
+  
+  + Parameters
+    + run_id (number, optional) Retreive steps by run ... 1
+
+### Test step [/tests/steps/{id}]
+
+####  Retreive
+
+- Parameters
+  - id (integer) ... Unique id of the step
+
+- Model
+  - Attributes
+    - origin (object) ... Origin path of the step in the blueprint AST
+      - group (string) ... Group name
+      - resource (string) ... Resource name 
+      - action (string) ... Action name
+      - example (string) ... Example name
+    - start_at (integer) ...
+    - end_at (integer) ... Unix timestamp when step ended
+    - result (string) ... Result of step execution
+    - type (string) ... Type of the step, shuould be HTTP or Cucumber for instance
+  
+  - Body
+
+    ```
+    {
+      "origin": {
+        "group": "Machines",
+        "resource": "Machines collection".
+        "action": "Create a machine",
+        "example": ""
+      }, 
+      "start_at": 1382017808,
+      "end_at": 1382017808,
+      "result": "failed",
+      "type" "gavel",
+      "data": {
+        "real": {},
+        "expected": {},
+        "output" {}
+      }
+    }
+    ```
